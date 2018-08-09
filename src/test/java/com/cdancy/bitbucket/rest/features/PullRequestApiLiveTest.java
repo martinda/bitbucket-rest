@@ -73,7 +73,7 @@ public class PullRequestApiLiveTest extends BaseBitbucketApiLiveTest {
     @BeforeClass
     public void init() {
         generatedTestContents = TestUtilities.initGeneratedTestContents(this.endpoint, this.bitbucketAuthentication, this.api);
-        this.project = generatedTestContents.project.key();
+        this.project = generatedTestContents.getProject().key();
         this.repo = generatedTestContents.repository.name();
 
         final BranchPage branchPage = api.branchApi().list(project, repo, null, null, null, null, null, null);

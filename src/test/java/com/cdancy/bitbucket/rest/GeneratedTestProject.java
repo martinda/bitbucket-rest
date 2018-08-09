@@ -21,27 +21,24 @@ import com.cdancy.bitbucket.rest.domain.project.Project;
 import com.cdancy.bitbucket.rest.domain.repository.Repository;
 
 /**
- * Umbrella for all generated test contents.
+ * Umbrella for the generated test project.
  */
-public class GeneratedTestContents {
+public class GeneratedTestProject {
     
-    public final GeneratedTestProject generatedTestProject;
-    public final Repository repository;
+    public final Project project;
+    
+    public final boolean projectPreviouslyExists;
 
     /**
-     * Default constructor for GeneratedTestContents.
+     * Default constructor for GeneratedTestProject.
      * 
      * @param project previously created Project.
-     * @param repository previously created Repository.
+     * @param projectPreviouslyExists whether the test suite created or user passed in.
      */
-    public GeneratedTestContents(final GeneratedTestProject generatedTestProject,
-            final Repository repository) {
+    public GeneratedTestProject(final Project project, 
+            final boolean projectPreviouslyExists) {
         
-        this.generatedTestProject = generatedTestProject;
-        this.repository = repository;
-    }
-
-    public Project getProject() {
-        return generatedTestProject.project;
+        this.project = project;
+        this.projectPreviouslyExists = projectPreviouslyExists;
     }
 }

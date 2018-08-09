@@ -45,10 +45,10 @@ public class ProjectApiLiveTest extends BaseBitbucketApiLiveTest {
 
     @Test
     public void testGetProject() {
-        final Project project = api().get(generatedTestContents.project.key());
+        final Project project = api().get(generatedTestContents.getProject().key());
         assertThat(project).isNotNull();
         assertThat(project.errors().isEmpty()).isTrue();
-        assertThat(project.key()).isEqualTo(generatedTestContents.project.key());
+        assertThat(project.key()).isEqualTo(generatedTestContents.getProject().key());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ProjectApiLiveTest extends BaseBitbucketApiLiveTest {
         assertThat(projects).isNotEmpty();
         boolean found = false;
         for (final Project possibleProject : projectPage.values()) {
-            if (possibleProject.key().equals(generatedTestContents.project.key())) {
+            if (possibleProject.key().equals(generatedTestContents.getProject().key())) {
                 found = true;
                 break;
             }
@@ -88,7 +88,7 @@ public class ProjectApiLiveTest extends BaseBitbucketApiLiveTest {
 
     @Test
     public void testCreateProjectWithIllegalName() {
-        if (!generatedTestContents.projectPreviouslyExists) {
+        if (!generatedTestContents.generatedTestProject.projectPreviouslyExists) {
             final String illegalProjectKey = "9999";
             final CreateProject createProject = CreateProject.create(illegalProjectKey, null, null, null);
             final Project project = api().create(createProject);

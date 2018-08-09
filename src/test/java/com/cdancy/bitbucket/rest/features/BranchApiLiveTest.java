@@ -61,7 +61,7 @@ public class BranchApiLiveTest extends BaseBitbucketApiLiveTest {
     @BeforeClass
     public void init() {
         generatedTestContents = TestUtilities.initGeneratedTestContents(this.endpoint, this.bitbucketAuthentication, this.api);
-        this.projectKey = generatedTestContents.project.key();
+        this.projectKey = generatedTestContents.getProject().key();
         this.repoKey = generatedTestContents.repository.name();
 
         final Branch branch = api().getDefault(projectKey, repoKey);

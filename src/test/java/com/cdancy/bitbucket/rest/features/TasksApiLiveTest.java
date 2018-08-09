@@ -53,7 +53,7 @@ public class TasksApiLiveTest extends BaseBitbucketApiLiveTest {
     @BeforeClass
     public void init() {
         generatedTestContents = TestUtilities.initGeneratedTestContents(this.endpoint, this.bitbucketAuthentication, this.api);
-        this.projectKey = generatedTestContents.project.key();
+        this.projectKey = generatedTestContents.getProject().key();
         this.repoKey = generatedTestContents.repository.name();
         
         final BranchPage branchPage = api.branchApi().list(projectKey, repoKey, null, null, null, null, null, null);

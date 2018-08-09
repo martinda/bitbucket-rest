@@ -50,7 +50,7 @@ public class DefaultReviewersApiLiveTest extends BaseBitbucketApiLiveTest {
     @BeforeClass
     public void init() {
         this.generatedTestContents = TestUtilities.initGeneratedTestContents(this.endpoint, this.bitbucketAuthentication, this.api);
-        this.projectKey = generatedTestContents.project.key();
+        this.projectKey = generatedTestContents.getProject().key();
         this.repoKey = generatedTestContents.repository.name();
         this.user = TestUtilities.getDefaultUser(this.bitbucketAuthentication, this.api);
     }

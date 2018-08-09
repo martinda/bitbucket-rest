@@ -46,7 +46,7 @@ public class TagApiLiveTest extends BaseBitbucketApiLiveTest {
     @BeforeClass
     public void init() {
         generatedTestContents = TestUtilities.initGeneratedTestContents(this.endpoint, this.bitbucketAuthentication, this.api);
-        this.projectKey = generatedTestContents.project.key();
+        this.projectKey = generatedTestContents.getProject().key();
         this.repoKey = generatedTestContents.repository.name();
         
         final CommitPage commitPage = api.commitsApi().list(projectKey, repoKey, true, null, null, null, null, null, null, 1, 0);

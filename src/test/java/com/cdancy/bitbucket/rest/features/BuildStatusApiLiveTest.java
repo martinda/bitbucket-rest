@@ -49,7 +49,7 @@ public class BuildStatusApiLiveTest extends BaseBitbucketApiLiveTest {
     @BeforeClass
     public void init() {
         generatedTestContents = TestUtilities.initGeneratedTestContents(this.endpoint, this.bitbucketAuthentication, this.api);
-        final String projectKey = generatedTestContents.project.key();
+        final String projectKey = generatedTestContents.getProject().key();
         final String repoKey = generatedTestContents.repository.name();
         
         final CommitPage commitPage = api.commitsApi().list(projectKey, repoKey, true, null, null, null, null, null, null, 1, null);

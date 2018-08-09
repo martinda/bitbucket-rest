@@ -128,16 +128,18 @@ public class TestUtilities extends BitbucketUtils {
     }
 
     /**
-     * Initialize live test contents.
+     * Maybe create a test project, or use one provided by the user.
      *
      * @param endpoint Bitbucket endpoint.
      * @param credential Bitbucket credential string.
      * @param api Bitbucket api object.
-     * @return GeneratedTestContents to use.
+     * @return Project to use for testing.
      */
-    public static synchronized GeneratedTestContents initGeneratedTestContents(final String endpoint,
-                                                                                final BitbucketAuthentication credential,
-                                                                                final BitbucketApi api) {
+    public static synchronized GeneratedTestProject maybeCreateTestProject(
+            final String endpoint,
+            final BitbucketAuthentication credential,
+            final BitbucketApi api) {
+
         assertThat(endpoint).isNotNull();
         assertThat(credential).isNotNull();
         assertThat(api).isNotNull();
@@ -161,14 +163,47 @@ public class TestUtilities extends BitbucketUtils {
             assertThat(project).isNotNull();
             assertThat(project.errors().isEmpty()).isTrue();
         }
+        return new GeneratedTestProject(project, projectPreviouslyExists);
+    }
 
+    /**
+     * Create a repository.
+     *
+     * @param project A Bitbucket project to host the test repository to be created.
+     * @return Repository to use for testing.
+     */
+    public static synchronized Repository createTestRepository(final BitbucketApi api, final Project project) {
         // create test repo
         final String repoKey = randomStringLettersOnly();
         final CreateRepository createRepository = CreateRepository.create(repoKey, true);
-        final Repository repository = api.repositoryApi().create(projectKey, createRepository);
+        final Repository repository = api.repositoryApi().create(project.key(), createRepository);
         assertThat(repository).isNotNull();
         assertThat(repository.errors().isEmpty()).isTrue();
+        return repository;
+    }
 
+    /**
+     * Initialize live test contents.
+     *
+     * @param endpoint Bitbucket endpoint.
+     * @param credential Bitbucket credential string.
+     * @param api Bitbucket api object.
+     * @return GeneratedTestContents to use.
+     */
+    public static synchronized GeneratedTestContents initGeneratedTestContents(final String endpoint,
+                                                                                final BitbucketAuthentication credential,
+                                                                                final BitbucketApi api) {
+        assertThat(endpoint).isNotNull();
+        assertThat(credential).isNotNull();
+        assertThat(api).isNotNull();
+
+        // Use the user provided test project, or create one
+        GeneratedTestProject generatedTestProject = maybeCreateTestProject(endpoint, credential, api);
+
+        // create test repo
+        Repository testRepository = createTestRepository(api, generatedTestProject.project);
+
+        // Prepare a local repository whose content will be pushed to the testRepository in the testProject
         final Path testDir = Paths.get(System.getProperty("test.bitbucket.basedir"));
         assertThat(testDir.toFile().exists()).isTrue();
         assertThat(testDir.toFile().isDirectory()).isTrue();
@@ -187,8 +222,8 @@ public class TestUtilities extends BitbucketUtils {
             final String generatedEndpoint = preCredentialPart
                     + foundCredential + "@"
                     + postCredentialPart + "/scm/"
-                    + projectKey.toLowerCase() + "/"
-                    + repoKey.toLowerCase() + ".git";
+                    + generatedTestProject.project.key().toLowerCase() + "/"
+                    + testRepository.name().toLowerCase() + ".git";
 
             generateGitContentsAndPush(generatedFileDir, generatedEndpoint);
 
@@ -196,7 +231,7 @@ public class TestUtilities extends BitbucketUtils {
             throw Throwables.propagate(e);
         }
 
-        return new GeneratedTestContents(project, repository, projectPreviouslyExists);
+        return new GeneratedTestContents(generatedTestProject, testRepository);
     }
 
     /**
@@ -273,7 +308,7 @@ public class TestUtilities extends BitbucketUtils {
         assertThat(api).isNotNull();
         assertThat(generatedTestContents).isNotNull();
 
-        final Project project = generatedTestContents.project;
+        final Project project = generatedTestContents.getProject();
         final Repository repository = generatedTestContents.repository;
 
         // delete repository
@@ -283,7 +318,7 @@ public class TestUtilities extends BitbucketUtils {
         assertThat(success.errors()).isEmpty();
 
         // delete project
-        if (!generatedTestContents.projectPreviouslyExists) {
+        if (!generatedTestContents.generatedTestProject.projectPreviouslyExists) {
             final RequestStatus deleteStatus = api.projectApi().delete(project.key());
             assertThat(deleteStatus).isNotNull();
             assertThat(deleteStatus.value()).isTrue();
